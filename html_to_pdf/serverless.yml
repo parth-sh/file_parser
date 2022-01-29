@@ -1,0 +1,39 @@
+service: html-to-pdf
+
+frameworkVersion: '2'
+
+package:
+  individually: true
+  exclude:
+    - venv/**
+    - node_modules/**
+    - packeage.json
+    - package-lock.json
+
+provider:
+  name: aws
+  runtime: python3.8
+  versionFunctions: false
+  apiGateway:
+    shouldStartNameWithService: true
+  region: ap-south-1
+
+
+functions:
+  convert_to_pdf:
+    handler: src/handler.html_to_pdf_handler
+    timeout: 30
+    environment:
+      "FONT_CONFIG_PATH": '/opt/fonts/'
+      "FONTCONFIG_FILE": '/opt/fonts/fonts.conf'
+    events:
+      - http:
+          path: convert-to-pdf
+          method: post
+          cors: true
+
+plugins:
+  - serverless-python-requirements
+custom:
+  pythonRequirements:
+    dockerFile: non-linux
